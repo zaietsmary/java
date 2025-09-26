@@ -40,3 +40,15 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Gradle build directory
+/build/
+/out/
+
+# Gradle wrapper files
+/gradle/
+/gradlew
+/gradlew.bat
+
+# Gradle caches
+.gradle/

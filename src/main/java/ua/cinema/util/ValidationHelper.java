@@ -33,4 +33,6 @@ public class ValidationHelper {
     public static boolean isPositiveNumber(double number) {
         return number > 0;
     }
+
+
 }

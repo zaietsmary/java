@@ -1,11 +1,11 @@
 package ua.cinema.util;
 
+import ua.cinema.model.Genre;
 import java.time.LocalDate;
 
 public class MovieUtils {
 
-    private MovieUtils() {
-    }
+    private MovieUtils() {}
 
     public static boolean isValidTitle(String title) {
         return ValidationHelper.isStringLengthBetween(title, 1, 30);
@@ -15,9 +15,7 @@ public class MovieUtils {
         return ValidationHelper.isPositiveNumber(duration);
     }
 
-    public static boolean isValidGenre(String genre) {
-        return ValidationHelper.isStringLengthBetween(genre, 1, 20);
-    }
+    public static boolean isValidGenre(Genre genre) { return genre != null; }
 
     public static boolean isValidReleaseDate(LocalDate releaseDate) {
         if (releaseDate == null) {
@@ -26,9 +24,5 @@ public class MovieUtils {
         LocalDate today = LocalDate.now();
         LocalDate hundredYearsAgo = today.minusYears(100);
         return !releaseDate.isAfter(today) && !releaseDate.isBefore(hundredYearsAgo);
-    }
-
-    public static boolean isPositiveReleaseDate(int releaseDate) {
-        return ValidationHelper.isPositiveNumber(releaseDate);
     }
 }

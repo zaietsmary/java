@@ -4,40 +4,32 @@ import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
-        Actor actor = new Actor("Anastasiia", "Golovata", 2002);
-        System.out.println(actor);
+        Actor actor = Actor.of("Tom", "Hanks", 1956);
+        System.out.println(actor.getFullName());
 
-        Movie m1 = new Movie("Inception", "Sci-Fi", 148, LocalDate.of(2010, 7, 16));
-        System.out.println(m1);
-        System.out.println("Movie genre (package-private): " + m1.genre);
-        System.out.println("Movie duration (protected): " + m1.durationMinutes + " minutes");
+        Hall hall = Hall.of(1, 100);
+        System.out.println(hall.getHallInfo());
 
-        Movie m2 = Movie.of("Interstellar", "Sci-Fi", 169, LocalDate.of(2014, 11, 7));
+        Movie movie = Movie.of("Forrest Gump", Genre.DRAMA, 142, LocalDate.of(1994, 7, 6));
+        System.out.println(movie.title() + " - " + Movie.getGenreDescription(movie.genre()));
 
-        Movie m3 = new Movie();
-        m3.setTitle("The Dark Knight");
-        m3.setGenre("Action");
-        m3.setDurationMinutes(152);
-        m3.setReleaseDate(LocalDate.of(2008, 7, 18));
-        System.out.println(m2);
+        String rating = switch (movie.genre()) {
+            case ACTION, HORROR -> "High intensity";
+            case DRAMA -> "Emotional";
+            case COMEDY -> "Funny";
+            case DOCUMENTARY -> "Informative";
+        };
+        System.out.println("Rating: " + rating);
 
-        try {
-            Movie badMovie = new Movie("Invalid", "Error", -100, LocalDate.now());
-            System.out.println("Should not print: " + badMovie);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Validation failed (negative duration): " + e.getMessage());
-        }
+        Movie movie2 = Movie.of("Inception", Genre.ACTION, 148, LocalDate.of(2010, 7, 16));
+        Hall hall2 = Hall.of(2, 120);
+        Screening screening = Screening.of(movie, hall, LocalDate.of(2025, 10, 1));
 
-        try {
-            Actor badActor = new Actor("", "", 3000);
-            System.out.println("Should not print: " + badActor);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Validation failed (invalid actor data): " + e.getMessage());
-        }
+        Ticket ticket = Ticket.of(screening, 5, 250.0, TicketStatus.AVAILABLE);
 
-        Hall hall = new Hall(2, 45);
-        Screening screening = Screening.of(m1, hall, LocalDate.of(2025, 9, 21));
-        System.out.println(screening);
+        System.out.println("Movie: " + movie2.title() + " - " + Movie.getGenreDescription(movie2.genre()));
+        System.out.println("Screening in " + hall2.getHallInfo() + " at " + screening.screeningDateTime());
+        System.out.println("Ticket seat " + ticket.seatNumber() + ": " + Ticket.getTicketStatus(ticket.ticketStatus()));
+
     }
-
 }

@@ -3,8 +3,7 @@ package ua.cinema.util;
 public class HallUtils {
 
 
-    private HallUtils() {
-    }
+    private HallUtils() {}
 
     public static boolean isValidHallNumber(int hallNumber) {
         return ValidationHelper.isPositiveNumber(hallNumber);
