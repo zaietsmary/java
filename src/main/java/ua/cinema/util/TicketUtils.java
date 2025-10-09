@@ -1,5 +1,7 @@
 package ua.cinema.util;
 
+import ua.cinema.model.TicketStatus;
+
 public class TicketUtils {
 
     private TicketUtils() {
@@ -15,5 +17,9 @@ public class TicketUtils {
 
     public static boolean isValidPrice(double price) {
         return ValidationHelper.isPositiveNumber(price);
+    }
+
+    public static boolean isValidTicketStatus(TicketStatus ticketStatus) {
+        return ticketStatus != null;
     }
 }
