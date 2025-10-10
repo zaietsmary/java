@@ -15,8 +15,8 @@ public class MainDemo {
     private static final Logger logger = Logger.getLogger(MainDemo.class.getName());
 
     public static void main(String[] args) {
-        String hallsFile = "D:\\untitled1\\src\\main\\java\\ua\\cinema\\halls.csv";
-        String moviesFile = "D:\\untitled1\\src\\main\\java\\ua\\cinema\\movies.csv";
+        String hallsFile = "D:\\untitled1\\src\\halls.csv";
+        String moviesFile = "D:\\untitled1\\src\\halls.csv";
 
         try {
             List<Hall> halls = HallFileParser.parseFromCSV(hallsFile);

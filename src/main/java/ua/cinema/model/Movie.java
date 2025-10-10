@@ -29,6 +29,7 @@ public record Movie(String title, Genre genre, int durationMinutes, LocalDate re
             case COMEDY      -> "Movies for a good mood";
             case HORROR      -> "Movies that scare";
             case DOCUMENTARY -> "Movies about real events";
+            case ADVENTURE    -> "Movies about the adventure";
         };
     }
 
