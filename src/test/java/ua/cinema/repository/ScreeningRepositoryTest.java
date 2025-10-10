@@ -24,16 +24,13 @@ class ScreeningRepositoryTest {
 
     @BeforeAll
     void setUpTestData() {
-        // Movies
         testMovie1 = new Movie("Inception", Genre.ACTION, 148, LocalDate.of(2010, 7, 16));
         testMovie2 = new Movie("Interstellar", Genre.ACTION, 169, LocalDate.of(2014, 11, 7));
 
-        // Halls
         testHall1 = new Hall(1, 100);
         testHall2 = new Hall(2, 150);
         testHall3 = new Hall(3, 80);
 
-        // Screenings
         testScreening1 = new Screening(testMovie1, testHall1, LocalDate.now().plusDays(1));
         testScreening2 = new Screening(testMovie1, testHall2, LocalDate.now().plusDays(2));
         testScreening3 = new Screening(testMovie2, testHall3, LocalDate.now().plusDays(3));

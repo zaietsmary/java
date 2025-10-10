@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-class GenericRepository<T> {
+public class GenericRepository<T> {
     private static final Logger logger = Logger.getLogger(GenericRepository.class.getName());
 
     private final List<T> items;

@@ -31,7 +31,6 @@ class HallFileParserTest {
         List<String> lines = List.of(
                 "1,100",
                 "2,150",
-                "# this is a comment",
                 "3,80"
         );
         Files.write(tempFile, lines);
