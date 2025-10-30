@@ -24,7 +24,7 @@ class TicketTest {
     }
 
     static Screening sampleScreening() {
-        return new Screening(sampleMovie(), sampleHall(), LocalDate.of(2025, 10, 20));
+        return new Screening(sampleMovie(), sampleHall(), LocalDate.of(2026, 10, 20));
     }
 
     @DisplayName("Parameterized test for valid ticket creation")

@@ -38,8 +38,11 @@ class ScreeningRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        screeningRepository = new GenericRepository<>(s -> s.getMovie().title(), "Movie");
-        screeningRepository.getItemsForTesting().add(testScreening1);
+        screeningRepository = new GenericRepository<>(
+                s -> s.getMovie().title() + "_" + s.getHall().getHallNumber() + "_" + s.getScreeningDateTime(),
+                "Screening"
+        );
+        screeningRepository.add(testScreening1);
     }
 
     @Test
@@ -70,9 +73,15 @@ class ScreeningRepositoryTest {
     @Test
     @DisplayName("Find existing screening")
     void testFindExistingScreening() {
-        Optional<Screening> result = screeningRepository.findByIdentity(testScreening1.getMovie().title());
+        String identity = testScreening1.getMovie().title() + "_" +
+                testScreening1.getHall().getHallNumber() + "_" +
+                testScreening1.getScreeningDateTime();
+
+        Optional<Screening> result = screeningRepository.findByIdentity(identity);
+
         assertTrue(result.isPresent(), "Should find testScreening1");
     }
+
 
     @Test
     @DisplayName("Find non-existing screening")
@@ -84,8 +93,13 @@ class ScreeningRepositoryTest {
     @Test
     @DisplayName("Remove existing screening")
     void testRemoveExistingScreening() {
+        String identity = testScreening1.getMovie().title() + "_" +
+                testScreening1.getHall().getHallNumber() + "_" +
+                testScreening1.getScreeningDateTime();
+
         int initialSize = screeningRepository.size();
-        boolean removed = screeningRepository.removeByIdentity(testScreening1.getMovie().title());
+
+        boolean removed = screeningRepository.removeByIdentity(identity);
 
         assertTrue(removed, "Should remove existing screening");
         assertEquals(initialSize - 1, screeningRepository.size(), "Size decreases by 1");
