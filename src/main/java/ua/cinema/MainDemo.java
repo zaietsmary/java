@@ -16,7 +16,7 @@ public class MainDemo {
 
     public static void main(String[] args) {
         String hallsFile = "D:\\untitled1\\src\\halls.csv";
-        String moviesFile = "D:\\untitled1\\src\\halls.csv";
+        String moviesFile = "D:\\untitled1\\src\\movies.csv";
 
         try {
             List<Hall> halls = HallFileParser.parseFromCSV(hallsFile);
