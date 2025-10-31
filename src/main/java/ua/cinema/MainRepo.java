@@ -58,7 +58,7 @@ public class MainRepo {
 
         Actor actor1 = new Actor("Tom", "Hanks", 1956);
         Actor actor2 = new Actor("Natalie", "Portman", 1981);
-        Actor actor3 = new Actor("Tom", "Cruise", 1962); // дубль за firstName
+        Actor actor3 = new Actor("Tom", "Cruise", 1962);
 
         logger.info("Додаємо акторів...");
         actorRepo.add(actor1);
