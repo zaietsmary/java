@@ -1,8 +1,17 @@
 package ua.cinema.model;
 
+import org.jetbrains.annotations.NotNull;
 import ua.cinema.util.TicketUtils;
 
-public record Ticket(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) {
+import java.util.Comparator;
+
+public record Ticket(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) implements Comparable<Ticket> {
+
+    public static final Comparator<Ticket> TIECKET_COMPARATOR =
+            Comparator.comparing(Ticket::screening)
+                    .thenComparing(Ticket::seatNumber)
+                    .thenComparing(Ticket::price)
+                    .thenComparing(Ticket::ticketStatus);
 
     public Ticket {
         if(!TicketUtils.isValidScreening(screening)){
@@ -31,5 +40,10 @@ public record Ticket(Screening screening, int seatNumber, double price, TicketSt
 
     public static Ticket of(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) {
         return new Ticket(screening, seatNumber, price, ticketStatus);
+    }
+
+    @Override
+    public int compareTo(@NotNull Ticket other) {
+        return TIECKET_COMPARATOR.compare(this, other);
     }
 }

@@ -1,10 +1,17 @@
 package ua.cinema.model;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 
+import org.jetbrains.annotations.NotNull;
 import ua.cinema.util.MovieUtils;
 
-public record Movie(String title, Genre genre, int durationMinutes, LocalDate releaseDate) {
+public record Movie(String title, Genre genre, int durationMinutes, LocalDate releaseDate) implements Comparable<Movie> {
+
+    private static final Comparator<Movie> MOVIE_COMPARATOR =
+            Comparator.comparing(Movie::title)
+            .thenComparing(Movie::durationMinutes)
+            .thenComparing(Movie::releaseDate);
 
     public Movie {
         if(!MovieUtils.isValidTitle(title)){
@@ -35,5 +42,10 @@ public record Movie(String title, Genre genre, int durationMinutes, LocalDate re
 
     public static Movie of(String title, Genre genre, int durationMinutes, LocalDate releaseDate) {
         return new Movie(title, genre, durationMinutes, releaseDate);
+    }
+
+    @Override
+    public int compareTo(@NotNull Movie other) {
+        return MOVIE_COMPARATOR.compare(this, other);
     }
 }

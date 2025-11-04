@@ -1,14 +1,21 @@
 package ua.cinema.model;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
 import ua.cinema.util.ScreeningUtils;
 
-public class Screening {
+public class Screening implements Comparable<Screening> {
     private Movie movie;
     private Hall hall;
     private LocalDate screeningDateTime;
+
+    public static final Comparator<Screening> SCREENING_COMPARATOR =
+            Comparator.comparing((Screening s) -> s.getMovie())
+            .thenComparing((Screening s) -> s.getHall())
+            .thenComparing((Screening s) -> s.getScreeningDateTime());
 
     public Screening() {
     }
@@ -96,5 +103,10 @@ public class Screening {
 
     public static Screening of(Movie movie, Hall hall, LocalDate screeningDateTime) {
         return new Screening(movie, hall, screeningDateTime);
+    }
+
+    @Override
+    public int compareTo(@NotNull Screening other) {
+        return SCREENING_COMPARATOR.compare(this, other);
     }
 }

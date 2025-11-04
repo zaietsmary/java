@@ -1,13 +1,20 @@
 package ua.cinema.model;
 
+import java.util.Comparator;
 import java.util.Objects;
-
+import ua.cinema.repository.Identity;
 import ua.cinema.util.ActorUtils;
+import org.jetbrains.annotations.NotNull;
 
-public class Actor {
+public class Actor implements Comparable<Actor>, Identity {
     private String firstName;
     private String lastName;
     private int birthYear;
+
+    private static final Comparator<Actor> ACTOR_COMPARATOR =
+            Comparator.comparing(Actor::getLastName)
+                    .thenComparing(Actor::getFirstName)
+                    .thenComparingInt(Actor::getBirthYear);
 
     public Actor() {
     }
@@ -110,5 +117,15 @@ public class Actor {
 
     public static Actor of(String firstName, String lastName, int birthYear) {
         return new Actor(firstName, lastName, birthYear);
+    }
+
+    @Override
+    public int compareTo(@NotNull Actor other) {
+        return ACTOR_COMPARATOR.compare(this, other);
+    }
+
+    @Override
+    public String getIdentity() {
+        return firstName + " " + lastName + " (" + birthYear + ")";
     }
 }

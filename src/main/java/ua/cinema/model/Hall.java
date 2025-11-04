@@ -1,12 +1,20 @@
 package ua.cinema.model;
 
+import java.util.Comparator;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
 import ua.cinema.util.HallUtils;
 
-public class Hall {
+import org.jetbrains.annotations.NotNull;
+
+public class Hall implements Comparable<Hall> {
     private int hallNumber;
     private int capacity;
+
+    private static final Comparator<Hall> HALL_COMPARATOR =
+            Comparator.comparing(Hall::getHallNumber)
+            .thenComparing(Hall::getCapacity);
 
     public Hall() {
     }
@@ -78,5 +86,10 @@ public class Hall {
 
     public static Hall of(int hallNumber, int capacity) {
         return new Hall(hallNumber, capacity);
+    }
+
+    @Override
+    public int compareTo(@NotNull Hall other) {
+        return HALL_COMPARATOR.compare(this, other);
     }
 }
