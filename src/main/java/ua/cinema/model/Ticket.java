@@ -28,6 +28,11 @@ public record Ticket(Screening screening, int seatNumber, double price, TicketSt
         }
     }
 
+    @Override
+    public String toString() {
+        return "Ticket{" + "screening" + screening + ", seat number" + seatNumber + ", status" + ticketStatus + "}";
+    }
+
     public static String getTicketStatus(TicketStatus ticketStatus) {
         switch (ticketStatus) {
             case RESERVED: return "Reserved";
