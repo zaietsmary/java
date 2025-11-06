@@ -3,11 +3,13 @@ package ua.cinema.model;
 import java.util.Comparator;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jetbrains.annotations.NotNull;
 import ua.cinema.util.HallUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Hall implements Comparable<Hall> {
     private int hallNumber;
     private int capacity;

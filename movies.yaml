@@ -1,0 +1,14 @@
+- title: Inception
+  genre: ACTION
+  durationMinutes: 148
+  releaseDate:
+  - 2010
+  - 7
+  - 16
+- title: Oppenheimer
+  genre: DRAMA
+  durationMinutes: 180
+  releaseDate:
+  - 2023
+  - 7
+  - 21

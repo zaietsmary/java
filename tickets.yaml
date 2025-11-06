@@ -1,0 +1,100 @@
+- screening:
+    movie:
+      title: Inception
+      genre: ACTION
+      durationMinutes: 148
+      releaseDate:
+      - 2010
+      - 7
+      - 16
+    hall:
+      hallNumber: 1
+      capacity: 120
+      hallInfo: "Hall 1 (Capacity: 120)"
+    screeningDateTime:
+    - 2025
+    - 11
+    - 10
+  seatNumber: 1
+  price: 150.0
+  ticketStatus: AVAILABLE
+- screening:
+    movie:
+      title: Inception
+      genre: ACTION
+      durationMinutes: 148
+      releaseDate:
+      - 2010
+      - 7
+      - 16
+    hall:
+      hallNumber: 1
+      capacity: 120
+      hallInfo: "Hall 1 (Capacity: 120)"
+    screeningDateTime:
+    - 2025
+    - 11
+    - 10
+  seatNumber: 2
+  price: 150.0
+  ticketStatus: SOLD
+- screening:
+    movie:
+      title: Interstellar
+      genre: ACTION
+      durationMinutes: 169
+      releaseDate:
+      - 2014
+      - 11
+      - 7
+    hall:
+      hallNumber: 2
+      capacity: 200
+      hallInfo: "Hall 2 (Capacity: 200)"
+    screeningDateTime:
+    - 2025
+    - 11
+    - 11
+  seatNumber: 1
+  price: 180.0
+  ticketStatus: RESERVED
+- screening:
+    movie:
+      title: Interstellar
+      genre: ACTION
+      durationMinutes: 169
+      releaseDate:
+      - 2014
+      - 11
+      - 7
+    hall:
+      hallNumber: 2
+      capacity: 200
+      hallInfo: "Hall 2 (Capacity: 200)"
+    screeningDateTime:
+    - 2025
+    - 11
+    - 11
+  seatNumber: 2
+  price: 180.0
+  ticketStatus: AVAILABLE
+- screening:
+    movie:
+      title: Soul
+      genre: COMEDY
+      durationMinutes: 100
+      releaseDate:
+      - 2020
+      - 12
+      - 25
+    hall:
+      hallNumber: 1
+      capacity: 120
+      hallInfo: "Hall 1 (Capacity: 120)"
+    screeningDateTime:
+    - 2025
+    - 11
+    - 12
+  seatNumber: 1
+  price: 200.0
+  ticketStatus: CANCELED

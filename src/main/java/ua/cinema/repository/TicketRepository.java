@@ -12,8 +12,13 @@ public class TicketRepository extends GenericRepository<Ticket> {
     private static final Logger logger = LoggerFactory.getLogger(TicketRepository.class);
 
     public TicketRepository() {
-        super(Ticket::toString, "Ticket");
+        super(ticket -> ticket.screening().getMovie().title() + "_" +
+                        ticket.screening().getHall().getHallNumber() + "_" +
+                        ticket.screening().getScreeningDateTime() + "_" +
+                        ticket.seatNumber(),
+                "Ticket");
     }
+
 
     /**
      * Find tickets by price.
