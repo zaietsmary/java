@@ -14,37 +14,37 @@ public class Main {
 
         Movie[] movies = new Movie[3];
         try {
-            movies[0] = Movie.of("Inception", Genre.ACTION, 148, LocalDate.of(2010, 7, 16));
-            movies[1] = Movie.of("Interstellar", Genre.DRAMA, 169, LocalDate.of(2014, 11, 7));
-            movies[2] = Movie.of("The Hangover", Genre.COMEDY, 100, LocalDate.of(2009, 6, 5));
+            movies[0] = Movie.createMovie("Inception", Genre.ACTION, 148, LocalDate.of(2010, 7, 16));
+            movies[1] = Movie.createMovie("Interstellar", Genre.DRAMA, 169, LocalDate.of(2014, 11, 7));
+            movies[2] = Movie.createMovie("The Hangover", Genre.COMEDY, 100, LocalDate.of(2009, 6, 5));
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Помилка створення фільму: " + e.getMessage());
         }
 
         Hall[] halls = new Hall[2];
         try {
-            halls[0] = Hall.of(1, 100);
-            halls[1] = Hall.of(2, 120);
+            halls[0] = Hall.createHall(1, 100);
+            halls[1] = Hall.createHall(2, 120);
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Помилка створення залу: " + e.getMessage());
         }
 
         Screening[] screenings = new Screening[3];
         try {
-            screenings[0] = Screening.of(movies[0], halls[0], LocalDate.of(2025, 10, 10));
-            screenings[1] = Screening.of(movies[1], halls[1], LocalDate.of(2025, 10, 11));
-            screenings[2] = Screening.of(movies[2], halls[0], LocalDate.of(2025, 10, 12));
+            screenings[0] = Screening.createScreening(movies[0], halls[0], LocalDate.of(2025, 10, 10));
+            screenings[1] = Screening.createScreening(movies[1], halls[1], LocalDate.of(2025, 10, 11));
+            screenings[2] = Screening.createScreening(movies[2], halls[0], LocalDate.of(2025, 10, 12));
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Помилка створення сеансу: " + e.getMessage());
         }
 
         Ticket[] tickets = new Ticket[5];
         try {
-            tickets[0] = Ticket.of(screenings[0], 1, 150.0, TicketStatus.AVAILABLE);
-            tickets[1] = Ticket.of(screenings[0], 2, 150.0, TicketStatus.RESERVED);
-            tickets[2] = Ticket.of(screenings[1], 5, 200.0, TicketStatus.SOLD);
-            tickets[3] = Ticket.of(screenings[2], 10, 120.0, TicketStatus.AVAILABLE);
-            tickets[4] = Ticket.of(screenings[2], 11, 120.0, TicketStatus.CANCELED);
+            tickets[0] = Ticket.createTicket(screenings[0], 1, 150.0, TicketStatus.AVAILABLE);
+            tickets[1] = Ticket.createTicket(screenings[0], 2, 150.0, TicketStatus.RESERVED);
+            tickets[2] = Ticket.createTicket(screenings[1], 5, 200.0, TicketStatus.SOLD);
+            tickets[3] = Ticket.createTicket(screenings[2], 10, 120.0, TicketStatus.AVAILABLE);
+            tickets[4] = Ticket.createTicket(screenings[2], 11, 120.0, TicketStatus.CANCELED);
         } catch (IllegalArgumentException e) {
             logger.log(Level.SEVERE, "Помилка створення квитка: " + e.getMessage());
         }
@@ -63,7 +63,7 @@ public class Main {
         }
 
         try {
-            Ticket invalidTicket = Ticket.of(screenings[0], -1, -50.0, null);
+            Ticket invalidTicket = Ticket.createTicket(screenings[0], -1, -50.0, null);
         } catch (IllegalArgumentException e) {
             logger.log(Level.SEVERE, "Спроба створити некоректний квиток: " + e.getMessage());
         }

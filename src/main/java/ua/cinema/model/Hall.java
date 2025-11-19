@@ -2,62 +2,89 @@ package ua.cinema.model;
 
 import java.util.Comparator;
 import java.util.Objects;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.jetbrains.annotations.NotNull;
-import ua.cinema.util.HallUtils;
-
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import ua.cinema.exception.InvalidDataException;
+import ua.cinema.util.ValidationUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hall implements Comparable<Hall> {
+
+    private static final Logger logger = LoggerFactory.getLogger(Hall.class);
+
+    @Min(value = 1, message = "hallNumber must be >= 1")
+    @Max(value = 10, message = "hallNumber cannot be bigger than 10")
     private int hallNumber;
+    @Min(value = 1, message = "capacity must be >= 1")
+    @Max(value = 100, message = "capacity cannot be bigger than 100")
     private int capacity;
 
     private static final Comparator<Hall> HALL_COMPARATOR =
             Comparator.comparing(Hall::getHallNumber)
             .thenComparing(Hall::getCapacity);
 
-    public Hall() {
-    }
-
     public Hall(int hallNumber, int capacity) {
-        if(!HallUtils.isValidHallNumber(hallNumber)){
-            throw new IllegalArgumentException("Invalid hall number: " + hallNumber);
-        }
-        if(!HallUtils.isValidCapacity(capacity)){
-            throw new IllegalArgumentException("Invalid capacity: " + capacity);
-        }
+        logger.debug("Attempting to create Hall: hallNumber={}, capacity={}", hallNumber, capacity);
         this.hallNumber = hallNumber;
         this.capacity = capacity;
+
+        try {
+            ValidationUtils.validate(this);
+            logger.info("Hall successfully created: {}", this);
+        } catch (InvalidDataException e) {
+            logger.error("Validation failed for Hall: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    public int getHallNumber() {
-        if(!HallUtils.isValidHallNumber(hallNumber)){
-            throw new IllegalStateException("Invalid hall number: " + hallNumber);
+    public static Hall createHall(int hallNumber, int capacity) {
+        try {
+            Hall hall = new Hall(hallNumber, capacity);
+            return hall;
+        } catch (InvalidDataException e) {
+            logger.error("Factory: failed to create Hall: {}", e.getMessage());
+            throw e;
         }
+    }
+
+
+    public int getHallNumber() {
         return hallNumber;
     }
 
     public void setHallNumber(int hallNumber) {
-        if(!HallUtils.isValidHallNumber(hallNumber)){
-            throw new IllegalArgumentException("Invalid hall number: " + hallNumber);
-        }
+        int old = this.hallNumber;
         this.hallNumber = hallNumber;
+
+        try {
+            ValidationUtils.validate(this);
+            logger.info("Set hall number='{}'", this.hallNumber);
+        } catch (InvalidDataException e) {
+            this.hallNumber = old;
+            logger.error("Invalid hallNumber, rollback to previous value='{}'", this.hallNumber, e);
+            throw e;
+        }
     }
 
     public int getCapacity() {
-        if(!HallUtils.isValidCapacity(capacity)){
-            throw new IllegalStateException("Invalid capacity: " + capacity);
-        }
         return capacity;
     }
 
     public void setCapacity(int capacity) {
-        if(!HallUtils.isValidCapacity(capacity)){
-            throw new IllegalArgumentException("Invalid capacity: " + capacity);
-        }
+        int old = this.capacity;
         this.capacity = capacity;
+        try {
+            ValidationUtils.validate(this);
+            logger.info("Set capacity='{}'", this.capacity);
+        } catch (InvalidDataException e) {
+            this.capacity = old;
+            logger.error("Invalid capacity: {}", capacity, e);
+            throw e;
+        }
     }
 
     @Override
@@ -84,10 +111,6 @@ public class Hall implements Comparable<Hall> {
     @Override
     public int hashCode() {
         return Objects.hash(hallNumber, capacity);
-    }
-
-    public static Hall of(int hallNumber, int capacity) {
-        return new Hall(hallNumber, capacity);
     }
 
     @Override

@@ -28,12 +28,10 @@ class ActorRepositorySortingTest {
         logger.info("Setting up test data");
         actorRepository = new ActorRepository();
 
-        // Різні прізвища
         actorAlice = new Actor("Alice", "Smith", 1985);
         actorBob = new Actor("Bob", "Johnson", 1983);
         actorCharlie = new Actor("Charlie", "Brown", 1990);
 
-        // Ті самі прізвища, різні імена
         actorAliceB = new Actor("Alice", "Williams", 1987);
         actorAliceA = new Actor("Anna", "Williams", 1992);
 

@@ -3,31 +3,65 @@ package ua.cinema.model;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-import org.jetbrains.annotations.NotNull;
-import ua.cinema.util.MovieUtils;
+import jakarta.validation.constraints.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.cinema.exception.InvalidDataException;
+import ua.cinema.util.ValidationUtils;
 
-public record Movie(String title, Genre genre, int durationMinutes, LocalDate releaseDate) implements Comparable<Movie> {
+public record Movie(
+        @NotBlank(message = "title cannot be blank")
+        @Size(min = 1, max = 100, message = "title must be between 1 and 100 characters")
+        String title,
+
+        @NotNull(message = "genre cannot be null")
+        Genre genre,
+
+        @Min(value = 1, message = "duration must be >= 1")
+        @Max(value = 500, message = "duration must be <= 500")
+        int durationMinutes,
+
+        @NotNull(message = "releaseDate cannot be null")
+        LocalDate releaseDate
+) implements Comparable<Movie> {
+
+    private static final Logger logger = LoggerFactory.getLogger(Movie.class);
 
     private static final Comparator<Movie> MOVIE_COMPARATOR =
             Comparator.comparing(Movie::title)
-            .thenComparing(Movie::durationMinutes)
-            .thenComparing(Movie::releaseDate);
+                    .thenComparing(Movie::durationMinutes)
+                    .thenComparing(Movie::releaseDate);
 
-    public Movie {
-        if(!MovieUtils.isValidTitle(title)){
-            throw new IllegalArgumentException("Invalid title: " + title);
-        }
-        if(!MovieUtils.isValidGenre(genre)){
-            throw new IllegalArgumentException("Invalid genre: " + genre);
-        }
-        if(!MovieUtils.isValidDuration(durationMinutes)){
-            throw new IllegalArgumentException("Invalid duration: " + durationMinutes);
-        }
-        if(!MovieUtils.isValidReleaseDate(releaseDate)){
-            throw new IllegalArgumentException("Invalid releaseDate: " + releaseDate);
+    public Movie(String title, Genre genre, int durationMinutes, LocalDate releaseDate) {
+        this.title = title;
+        this.genre = genre;
+        this.durationMinutes = durationMinutes;
+        this.releaseDate = releaseDate;
+
+        logger.debug("Attempting to validate Movie: title='{}', genre={}, duration={}, releaseDate={}",
+                title, genre, durationMinutes, releaseDate);
+
+        try {
+            ValidationUtils.validate(this);
+            logger.info("Movie successfully created: {}", this);
+        } catch (InvalidDataException e) {
+            logger.error("Validation failed for Movie: {}", e.getMessage());
+            throw e;
         }
     }
 
+    public static Movie createMovie(String title, Genre genre, int durationMinutes, LocalDate releaseDate) {
+        logger.debug("Factory: attempting to create Movie: title='{}', genre={}, duration={}, releaseDate={}",
+                title, genre, durationMinutes, releaseDate);
+        try {
+            Movie movie = new Movie(title, genre, durationMinutes, releaseDate);
+            logger.info("Factory: created Movie {}", movie);
+            return movie;
+        } catch (InvalidDataException e) {
+            logger.error("Factory: failed to create Movie: {}", e.getMessage());
+            throw e;
+        }
+    }
 
     public static String getGenreDescription(Genre genre) {
         return switch (genre) {
@@ -36,16 +70,12 @@ public record Movie(String title, Genre genre, int durationMinutes, LocalDate re
             case COMEDY      -> "Movies for a good mood";
             case HORROR      -> "Movies that scare";
             case DOCUMENTARY -> "Movies about real events";
-            case ADVENTURE    -> "Movies about the adventure";
+            case ADVENTURE   -> "Movies about the adventure";
         };
     }
 
-    public static Movie of(String title, Genre genre, int durationMinutes, LocalDate releaseDate) {
-        return new Movie(title, genre, durationMinutes, releaseDate);
-    }
-
     @Override
-    public int compareTo(@NotNull Movie other) {
+    public int compareTo(Movie other) {
         return MOVIE_COMPARATOR.compare(this, other);
     }
 }

@@ -53,7 +53,6 @@ public class MainSerialization {
         JsonDataSerializer<Ticket> jsonSerializer = new JsonDataSerializer<>();
         YamlDataSerializer<Ticket> yamlSerializer = new YamlDataSerializer<>();
 
-        // --- СЕРІАЛІЗАЦІЯ ---
         try {
             jsonSerializer.serialize(ticketRepository.getAll(), ticketsJsonPath);
             yamlSerializer.serialize(ticketRepository.getAll(), ticketsYamlPath);
@@ -65,7 +64,6 @@ public class MainSerialization {
         TicketRepository ticketRepoFromJson = new TicketRepository();
         TicketRepository ticketRepoFromYaml = new TicketRepository();
 
-        // --- ДЕСЕРІАЛІЗАЦІЯ ---
         try {
             List<Ticket> ticketsFromJson = jsonSerializer.deserialize(ticketsJsonPath, Ticket.class);
             ticketsFromJson.forEach(ticketRepoFromJson::add);

@@ -105,7 +105,7 @@ class TicketTest {
     @Test
     void testFactoryMethodOf() {
         Screening screening = sampleScreening();
-        Ticket ticket = Ticket.of(screening, 3, 120.0, TicketStatus.AVAILABLE);
+        Ticket ticket = Ticket.createTicket(screening, 3, 120.0, TicketStatus.AVAILABLE);
 
         assertThat(ticket).isNotNull();
         assertThat(ticket.screening()).isEqualTo(screening);

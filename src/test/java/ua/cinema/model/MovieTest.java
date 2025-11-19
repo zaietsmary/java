@@ -69,7 +69,7 @@ class MovieTest {
 
     @Test
     void testFactoryMethodOf() {
-        Movie movie = Movie.of("Interstellar", Genre.DRAMA, 169, LocalDate.of(2014, 11, 7));
+        Movie movie = Movie.createMovie("Interstellar", Genre.DRAMA, 169, LocalDate.of(2014, 11, 7));
         assertThat(movie).isNotNull();
         assertThat(movie.title()).isEqualTo("Interstellar");
         assertThat(movie.genre()).isEqualTo(Genre.DRAMA);

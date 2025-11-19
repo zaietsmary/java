@@ -3,6 +3,9 @@ package ua.cinema.repository;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua.cinema.util.ValidationUtils;
+import ua.cinema.exception.InvalidDataException;
+
 
 public class GenericRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GenericRepository.class);
@@ -21,6 +24,13 @@ public class GenericRepository<T> {
     public boolean add(T item) {
         if (item == null) {
             logger.warn("Attempted to add null {}", entityType);
+            return false;
+        }
+
+        try {
+            ValidationUtils.validate(item);
+        } catch (InvalidDataException e) {
+            logger.error("Cannot add invalid {}: {}", entityType, e.getMessage());
             return false;
         }
 

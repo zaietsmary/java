@@ -1,54 +1,73 @@
 package ua.cinema.model;
 
-import org.jetbrains.annotations.NotNull;
-import ua.cinema.util.TicketUtils;
-
+import jakarta.validation.constraints.*;
+import ua.cinema.util.ValidationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Comparator;
+import ua.cinema.exception.InvalidDataException;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-public record Ticket(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) implements Comparable<Ticket> {
+public record Ticket(
+        @NotNull(message = "screening cannot be null")
+        Screening screening,
 
-    public static final Comparator<Ticket> TIECKET_COMPARATOR =
+        @Min(value = 1, message = "seatNumber must be >= 1")
+        int seatNumber,
+
+        @Positive(message = "price must be > 0")
+        double price,
+
+        @NotNull(message = "ticketStatus cannot be null")
+        TicketStatus ticketStatus
+) implements Comparable<Ticket> {
+
+    private static final Logger logger = LoggerFactory.getLogger(Ticket.class);
+
+    public static final Comparator<Ticket> TICKET_COMPARATOR =
             Comparator.comparing(Ticket::screening)
                     .thenComparing(Ticket::seatNumber)
                     .thenComparing(Ticket::price)
                     .thenComparing(Ticket::ticketStatus);
 
     public Ticket {
-        if(!TicketUtils.isValidScreening(screening)){
-            throw new IllegalArgumentException("Invalid screening: " + screening);
-        }
-        if(!TicketUtils.isValidSeatNumber(seatNumber)){
-            throw new IllegalArgumentException("Invalid seat number: " + seatNumber);
-        }
-        if(!TicketUtils.isValidPrice(price)) {
-            throw new IllegalArgumentException("Invalid price: " + price);
-        }
-        if(!TicketUtils.isValidTicketStatus(ticketStatus)){
-            throw new IllegalArgumentException("Invalid ticket status: " + ticketStatus);
+        logger.debug("Attempting to validate Ticket: screening={}, seat={}, price={}, status={}",
+                screening, seatNumber, price, ticketStatus);
+
+        try {
+            ValidationUtils.validate(this);
+            logger.info("Ticket successfully created: {}", this);
+        } catch (InvalidDataException e) {
+            logger.error("Validation failed for Ticket: {}", e.getMessage());
+            throw e;
         }
     }
 
-    @Override
-    public String toString() {
-        return "Ticket{" + "screening" + screening + ", seat number" + seatNumber + ", status" + ticketStatus + "}";
+    public static Ticket createTicket(Screening screening, int seatNumber, double price, TicketStatus status) {
+        logger.debug("Factory: attempting to create Ticket: screening={}, seat={}, price={}, status={}",
+                screening, seatNumber, price, status);
+        try {
+            Ticket ticket = new Ticket(screening, seatNumber, price, status);
+            logger.info("Factory: created Ticket {}", ticket);
+            return ticket;
+        } catch (InvalidDataException e) {
+            logger.error("Factory: failed to create Ticket: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public static String getTicketStatus(TicketStatus ticketStatus) {
-        switch (ticketStatus) {
-            case RESERVED: return "Reserved";
-            case AVAILABLE: return "Available";
-            case SOLD: return "Sold";
-            case CANCELED: return "Canceled";
-            default: throw new IllegalArgumentException("Invalid ticket status: " + ticketStatus);
-        }
-    }
-
-    public static Ticket of(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) {
-        return new Ticket(screening, seatNumber, price, ticketStatus);
+        return switch (ticketStatus) {
+            case RESERVED -> "Reserved";
+            case AVAILABLE -> "Available";
+            case SOLD -> "Sold";
+            case CANCELED -> "Canceled";
+        };
     }
 
     @Override
     public int compareTo(@NotNull Ticket other) {
-        return TIECKET_COMPARATOR.compare(this, other);
+        return TICKET_COMPARATOR.compare(this, other);
     }
 }
