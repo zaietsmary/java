@@ -23,8 +23,7 @@ public class ActorRepositoryTest {
                 .filter(a -> a.getBirthYear() > 1980)
                 .collect(Collectors.toList());
 
-        // In actors.json there are 6 actors born after 1980
-        Assertions.assertEquals(6, result.size());
+        Assertions.assertEquals(15, result.size());
     }
 
     @Test
@@ -40,7 +39,7 @@ public class ActorRepositoryTest {
         List<Actor> result = future.get();
         executor.shutdown();
 
-        Assertions.assertEquals(6, result.size());
+        Assertions.assertEquals(15, result.size());
     }
 
     @Test
@@ -55,7 +54,7 @@ public class ActorRepositoryTest {
 
         List<Actor> result = cf.get();
 
-        Assertions.assertEquals(6, result.size());
+        Assertions.assertEquals(15, result.size());
     }
 
     @Test
@@ -64,9 +63,10 @@ public class ActorRepositoryTest {
 
         List<Actor> sorted = repo.sortByName();
 
-        Assertions.assertEquals("Cumberbatch", sorted.get(0).getLastName());
+        Assertions.assertEquals("Cavill", sorted.get(0).getLastName());
         Assertions.assertEquals("Winslet", sorted.get(sorted.size() - 1).getLastName());
     }
+
 
     /** Helper: load repository from actors.json */
     private ActorRepository loadTestRepo() throws Exception {

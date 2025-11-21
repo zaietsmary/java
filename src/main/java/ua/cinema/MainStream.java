@@ -33,7 +33,7 @@ public class MainStream {
                 .peek(a -> {
                     long start = System.currentTimeMillis();
                     try {
-                        Thread.sleep(1000); // sleep 1 секунда
+                        Thread.sleep(1000);
                     } catch (InterruptedException ignored) {}
                     long end = System.currentTimeMillis();
                     System.out.println(Thread.currentThread().getName() + " processed " + a.getFirstName() +

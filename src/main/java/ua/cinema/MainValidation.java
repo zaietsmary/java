@@ -53,7 +53,6 @@ public class MainValidation {
             }
         }
 
-        // Підсумок репозиторію
         logger.info("Repository now contains {} valid movies:", movieRepository.size());
         movieRepository.getAll().forEach(m -> logger.info(" - {}", m));
     }
