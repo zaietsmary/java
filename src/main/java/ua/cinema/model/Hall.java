@@ -2,6 +2,8 @@ package ua.cinema.model;
 
 import java.util.Comparator;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -27,7 +29,8 @@ public class Hall implements Comparable<Hall> {
             Comparator.comparing(Hall::getHallNumber)
             .thenComparing(Hall::getCapacity);
 
-    public Hall(int hallNumber, int capacity) {
+    public Hall( @JsonProperty("hallNumber") int hallNumber,
+                 @JsonProperty("capacity") int capacity) {
         logger.debug("Attempting to create Hall: hallNumber={}, capacity={}", hallNumber, capacity);
         this.hallNumber = hallNumber;
         this.capacity = capacity;
@@ -40,6 +43,8 @@ public class Hall implements Comparable<Hall> {
             throw e;
         }
     }
+
+    public Hall() {}
 
     public static Hall createHall(int hallNumber, int capacity) {
         try {

@@ -1,7 +1,7 @@
 package ua.cinema.model;
 
 import jakarta.validation.constraints.*;
-import ua.cinema.util.ValidationUtils;
+        import ua.cinema.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Comparator;
@@ -31,7 +31,12 @@ public record Ticket(
                     .thenComparing(Ticket::price)
                     .thenComparing(Ticket::ticketStatus);
 
-    public Ticket {
+    public Ticket(Screening screening, int seatNumber, double price, TicketStatus ticketStatus) {
+        this.screening = screening;
+        this.seatNumber = seatNumber;
+        this.price = price;
+        this.ticketStatus = ticketStatus;
+
         logger.debug("Attempting to validate Ticket: screening={}, seat={}, price={}, status={}",
                 screening, seatNumber, price, ticketStatus);
 

@@ -1,8 +1,11 @@
 package ua.cinema.repository;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua.cinema.exception.AlreadyExistsException;
 import ua.cinema.util.ValidationUtils;
 import ua.cinema.exception.InvalidDataException;
 
@@ -15,34 +18,49 @@ public class GenericRepository<T> {
     private final String entityType;
 
     public GenericRepository(IdentityExtractor<T> identityExtractor, String entityType) {
-        this.items = new ArrayList<>();
+        this.items = new CopyOnWriteArrayList<>();
         this.identityExtractor = identityExtractor;
         this.entityType = entityType;
         logger.info("Created repository for {}", entityType);
     }
 
-    public boolean add(T item) {
-        if (item == null) {
-            logger.warn("Attempted to add null {}", entityType);
-            return false;
-        }
 
-        try {
-            ValidationUtils.validate(item);
-        } catch (InvalidDataException e) {
-            logger.error("Cannot add invalid {}: {}", entityType, e.getMessage());
-            return false;
+    public synchronized boolean add(T item) {
+        if (item == null) {
+            throw new InvalidDataException(entityType + " cannot be null");
         }
 
         String identity = identityExtractor.extractIdentity(item);
+
         if (findByIdentity(identity).isPresent()) {
-            logger.warn("Cannot add {} - already exists with identity: {}", entityType, identity);
-            return false;
+            String errorMsg = String.format("%s already exists with identity: %s", entityType, identity);
+            logger.error(errorMsg);
+            throw new AlreadyExistsException(errorMsg);
         }
 
-        boolean added = items.add(item);
+        items.add(item);
         logger.info("Added {}: {}", entityType, identity);
-        return added;
+        return true;
+    }
+
+    public int addAll(Collection<T> newItems) {
+        if (newItems == null || newItems.isEmpty()) {
+            return 0;
+        }
+
+        int addedCount = 0;
+        for (T item : newItems) {
+            try {
+                if (add(item)) {
+                    addedCount++;
+                }
+            } catch (AlreadyExistsException e) {
+                logger.debug("Skipping duplicate: {}", e.getMessage());
+            }
+        }
+
+        logger.info("Bulk added {} of {} items to {}", addedCount, newItems.size(), entityType);
+        return addedCount;
     }
 
     /**

@@ -3,6 +3,9 @@ package ua.cinema.model;
 import java.util.Comparator;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +14,7 @@ import ua.cinema.exception.InvalidDataException;
 import ua.cinema.repository.Identity;
 import ua.cinema.util.ValidationUtils;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Actor implements Comparable<Actor>, Identity {
 
     private static final Logger logger = LoggerFactory.getLogger(Actor.class);
@@ -36,7 +40,10 @@ public class Actor implements Comparable<Actor>, Identity {
                     .thenComparing(Actor::getFirstName)
                     .thenComparingInt(Actor::getBirthYear);
 
-    public Actor(String firstName, String lastName, int birthYear) {
+    @JsonCreator
+    public Actor( @JsonProperty("firstName") String firstName,
+                  @JsonProperty("lastName") String lastName,
+                  @JsonProperty("birthYear") int birthYear) {
         logger.debug("Attempting to create Actor: firstName={}, lastName={}, birthYear={}",
                 firstName, lastName, birthYear);
 
@@ -51,6 +58,9 @@ public class Actor implements Comparable<Actor>, Identity {
             logger.error("Failed to create Actor: {}", e.getMessage());
             throw e;
         }
+    }
+
+    public Actor() {
     }
 
     public static Actor createActor(String firstName, String lastName, int birthYear) {

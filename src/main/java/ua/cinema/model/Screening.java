@@ -3,6 +3,9 @@ package ua.cinema.model;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,11 +32,13 @@ public class Screening implements Comparable<Screening> {
                     .thenComparing(Screening::getHall)
                     .thenComparing(Screening::getScreeningDateTime);
 
-    public Screening(Movie movie, Hall hall, LocalDate screeningDateTime) {
+
+    public Screening(@JsonProperty("movie") Movie movie,
+                     @JsonProperty("hall") Hall hall,
+                     @JsonProperty("screeningDateTime") LocalDate screeningDateTime) {
         this.movie = movie;
         this.hall = hall;
         this.screeningDateTime = screeningDateTime;
-
         try {
             ValidationUtils.validate(this);
             logger.info("Screening successfully created: {}", this);
