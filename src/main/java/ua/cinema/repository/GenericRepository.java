@@ -1,30 +1,37 @@
 package ua.cinema.repository;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ua.cinema.exception.AlreadyExistsException;
-import ua.cinema.util.ValidationUtils;
 import ua.cinema.exception.InvalidDataException;
 
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Generic repository for managing collections of objects
+ * Thread-safe implementation for concurrent access
+ */
 public class GenericRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GenericRepository.class);
 
-    private final List<T> items;
+    protected final List<T> items;
     private final IdentityExtractor<T> identityExtractor;
-    private final String entityType;
+    protected final String entityType;
 
     public GenericRepository(IdentityExtractor<T> identityExtractor, String entityType) {
         this.items = new CopyOnWriteArrayList<>();
         this.identityExtractor = identityExtractor;
         this.entityType = entityType;
-        logger.info("Created repository for {}", entityType);
+        logger.info("Created thread-safe repository for {}", entityType);
     }
 
-
+    /**
+     * Add an item to the repository (thread-safe)
+     *
+     * @throws InvalidDataException if item is null
+     * @throws AlreadyExistsException if item with this identity already exists
+     */
     public synchronized boolean add(T item) {
         if (item == null) {
             throw new InvalidDataException(entityType + " cannot be null");
@@ -64,35 +71,33 @@ public class GenericRepository<T> {
     }
 
     /**
-     * Remove an item using equals() method - RECOMMENDED APPROACH
+     * Remove an item using equals() method (thread-safe)
      */
-    public boolean remove(T item) {
+    public synchronized boolean remove(T item) {
         if (item == null) {
             logger.warn("Attempted to remove null {}", entityType);
             return false;
         }
 
-        boolean removed = items.remove(item); // Uses equals() internally
+        boolean removed = items.remove(item);
         if (removed) {
-            logger.info("Removed {}: {}", entityType, identityExtractor.extractIdentity(item));
+            logger.info("Removed {}: {}", entityType, item);
         } else {
-            logger.warn("Failed to remove {}: {}", entityType, identityExtractor.extractIdentity(item));
+            logger.warn("Failed to remove {}: {}", entityType, item);
         }
         return removed;
     }
 
     /**
-     * Remove by identity - alternative approach when you only have the identity
+     * Remove by identity (thread-safe)
      */
-    public boolean removeByIdentity(String identity) {
+    public synchronized boolean removeByIdentity(String identity) {
         if (identity == null) {
             logger.warn("Attempted to remove {} with null identity", entityType);
             return false;
         }
 
-        Optional<T> itemToRemove = items.stream()
-                .filter(item -> identity.equals(identityExtractor.extractIdentity(item)))
-                .findFirst();
+        Optional<T> itemToRemove = findByIdentityInternal(identity);
 
         if (itemToRemove.isPresent()) {
             boolean removed = items.remove(itemToRemove.get());
@@ -107,17 +112,45 @@ public class GenericRepository<T> {
     }
 
     /**
+     * Update an existing item (thread-safe)
+     * Finds item by identity extracted from newItem and replaces it
+     *
+     * @param newItem New item to replace with
+     * @return true if updated, false if item not found
+     * @throws InvalidDataException if newItem is null
+     */
+    public synchronized boolean update(T newItem) {
+        if (newItem == null) {
+            throw new InvalidDataException(entityType + " cannot be null");
+        }
+
+        String identity = identityExtractor.extractIdentity(newItem);
+        Optional<T> existingItem = findByIdentityInternal(identity);
+
+        if (existingItem.isEmpty()) {
+            logger.warn("Cannot update: {} not found with identity: {}", entityType, identity);
+            return false;
+        }
+
+        items.remove(existingItem.get());
+        items.add(newItem);
+
+        logger.info("Updated {}: {}", entityType, identity);
+        return true;
+    }
+
+    /**
      * Check if repository contains an item using equals()
      */
     public boolean contains(T item) {
-        return items.contains(item); // Uses equals() internally
+        return items.contains(item);
     }
 
     /**
      * Check if repository contains an item with given identity
      */
     public boolean containsIdentity(String identity) {
-        return findByIdentity(identity).isPresent();
+        return findByIdentityInternal(identity).isPresent();
     }
 
     /**
@@ -133,17 +166,23 @@ public class GenericRepository<T> {
                 .filter(item -> identity.equals(identityExtractor.extractIdentity(item)))
                 .findFirst();
 
-        if (result.isPresent()) {
-            logger.info("Found {} with identity: {}", entityType, identity);
-        } else {
-            logger.info("No {} found with identity: {}", entityType, identity);
-        }
+        logger.debug("Find {} by identity '{}': {}", entityType, identity,
+                result.isPresent() ? "found" : "not found");
 
         return result;
     }
 
+    /**
+     * Internal find method without logging (for use in synchronized blocks)
+     */
+    private Optional<T> findByIdentityInternal(String identity) {
+        return items.stream()
+                .filter(item -> identity.equals(identityExtractor.extractIdentity(item)))
+                .findFirst();
+    }
+
     public List<T> getAll() {
-        logger.info("Retrieved all {}  items. Count: {}", entityType, items.size());
+        logger.info("Retrieved all {} items. Count: {}", entityType, items.size());
         return new ArrayList<>(items);
     }
 
@@ -155,33 +194,28 @@ public class GenericRepository<T> {
         return items.isEmpty();
     }
 
-    public void clear() {
+    public synchronized void clear() {
         int sizeBefore = items.size();
         items.clear();
-        logger.info("Cleared repository. Removed {} {} items",  sizeBefore,  entityType);
-    }
-
-    /**
-     * Package-private method for testing - allows direct access to items
-     * This should ONLY be used by tests in the same package
-     */
-    List<T> getItemsForTesting() {
-        return items;
+        logger.info("Cleared repository. Removed {} {} items", sizeBefore, entityType);
     }
 
     /**
      * Sort items by identity using ascending or descending order.
      */
-    public void sortByIdentity(boolean asc) {
-        items.sort(Comparator.comparing(identityExtractor::extractIdentity));
+    public synchronized void sortByIdentity(boolean asc) {
+        List<T> sorted = new ArrayList<>(items);
+        sorted.sort(Comparator.comparing(identityExtractor::extractIdentity));
         if (!asc) {
-            Collections.reverse(items);
+            Collections.reverse(sorted);
         }
+        items.clear();
+        items.addAll(sorted);
         logger.info("Sorted {} by identity in {} order", entityType, asc ? "ascending" : "descending");
     }
 
     /**
-     * Alternative: sort using String order ("desc" for descending, any other value for ascending)
+     * Alternative: sort using String order
      */
     public void sortByIdentity(String order) {
         boolean asc = !"desc".equalsIgnoreCase(order);
@@ -189,4 +223,21 @@ public class GenericRepository<T> {
         sortByIdentity(asc);
     }
 
+    /**
+     * Package-private method for testing
+     */
+    List<T> getItemsForTesting() {
+        return new ArrayList<>(items);
+    }
+
+    /**
+     * Publicly exposes the mechanism to extract the identity from an item.
+     * Used for logging and error messages outside the repository.
+     */
+    public String getIdentity(T item) {
+        if (item == null) {
+            return "null_item";
+        }
+        return identityExtractor.extractIdentity(item);
+    }
 }

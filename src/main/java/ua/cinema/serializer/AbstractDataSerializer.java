@@ -12,8 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract base class for data serializers with common validation and file handling logic
- * @param <T> Type of objects to serialize/deserialize
+ * Abstract base class for data serializers with common validation and file handling logic.
+ * Implements logic that is format-independent (like file path validation and list serialization/deserialization to files).
+ * * @param <T> Type of objects to serialize/deserialize
  */
 public abstract class AbstractDataSerializer<T> implements DataSerializer<T> {
 
@@ -23,6 +24,38 @@ public abstract class AbstractDataSerializer<T> implements DataSerializer<T> {
     protected AbstractDataSerializer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
+    // --- АБСТРАКТНІ МЕТОДИ ДЛЯ КОНКРЕТНОЇ РЕАЛІЗАЦІЇ ---
+
+    /**
+     * Get the format name (e.g., "JSON", "YAML").
+     * Must be implemented by concrete subclasses.
+     */
+    @Override
+    public abstract String getFormat();
+
+    /**
+     * Serialize a single item to String (required by DataSerializer).
+     * Must be implemented by concrete subclasses (e.g., JsonDataSerializer).
+     */
+    @Override
+    public abstract String toString(T item) throws DataSerializationException;
+
+    /**
+     * Serialize a list of items to String (required by DataSerializer).
+     * Must be implemented by concrete subclasses (e.g., JsonDataSerializer).
+     */
+    @Override
+    public abstract String listToString(List<T> items) throws DataSerializationException;
+
+    /**
+     * Deserialize a single item from String (required by DataSerializer).
+     * Must be implemented by concrete subclasses (e.g., JsonDataSerializer).
+     */
+    @Override
+    public abstract T fromString(String str, Class<T> clazz) throws DataSerializationException;
+
+    // --- ФУНКЦІОНАЛ ДЛЯ РОБОТИ З ФАЙЛАМИ (РЕАЛІЗОВАНО ТУТ) ---
 
     @Override
     public void serialize(List<T> items, String filePath) throws DataSerializationException {
@@ -52,16 +85,15 @@ public abstract class AbstractDataSerializer<T> implements DataSerializer<T> {
         try {
             File file = new File(filePath);
 
-            // Check if file exists and is not empty
             if (!file.exists()) {
                 throw new DataSerializationException("File does not exist: " + filePath);
             }
 
             if (file.length() == 0) {
-                throw new DataSerializationException("File is empty: " + filePath);
+                logger.warn("File is empty: {}. Returning empty list.", filePath);
+                return new ArrayList<>(); // Повертаємо порожній список, якщо файл пустий
             }
 
-            // Create JavaType for List<T>
             JavaType type = objectMapper.getTypeFactory().constructCollectionType(List.class, clazz);
             List<T> items = objectMapper.readValue(file, type);
 
@@ -80,36 +112,26 @@ public abstract class AbstractDataSerializer<T> implements DataSerializer<T> {
         }
     }
 
-    /**
-     * Validate that items list is not null
-     */
+    // --- ДОПОМІЖНІ МЕТОДИ ---
+
     protected void validateItemsForSerialization(List<T> items) throws DataSerializationException {
         if (items == null) {
             throw new DataSerializationException("Cannot serialize null list");
         }
     }
 
-    /**
-     * Validate that file path is not null or empty
-     */
     protected void validateFilePath(String filePath) throws DataSerializationException {
         if (filePath == null || filePath.trim().isEmpty()) {
             throw new DataSerializationException("File path cannot be null or empty");
         }
     }
 
-    /**
-     * Validate that class type is not null
-     */
     protected void validateClass(Class<T> clazz) throws DataSerializationException {
         if (clazz == null) {
             throw new DataSerializationException("Class type cannot be null");
         }
     }
 
-    /**
-     * Create parent directories if they don't exist
-     */
     protected void createParentDirectories(File file) {
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {

@@ -94,7 +94,7 @@ public class AppConfig {
 
         if (filename == null) {
             logger.warn("JSON filename not found for entity: {}. Using default.", entityType);
-            filename = String.format("%s.json", entityType.toLowerCase());
+            filename = String.format("%ss.json", entityType.toLowerCase()); // Додаємо 's', як у 'actors.json'
         }
 
         return combinePaths(basePath, filename);
@@ -113,7 +113,7 @@ public class AppConfig {
 
         if (filename == null) {
             logger.warn("YAML filename not found for entity: {}. Using default.", entityType);
-            filename = String.format("%s.yaml", entityType.toLowerCase());
+            filename = String.format("%ss.yaml", entityType.toLowerCase()); // Додаємо 's', як у 'actors.yaml'
         }
 
         return combinePaths(basePath, filename);
@@ -124,7 +124,7 @@ public class AppConfig {
      * @return Base data directory path
      */
     public String getBaseDataPath() {
-        return getProperty("data.path.base", "./data");
+        return getProperty("data.path.base", "data");
     }
 
     /**
@@ -143,8 +143,8 @@ public class AppConfig {
             return filename;
         }
 
-        // Otherwise combine base path with filename
-        return base.resolve(file).toString();
+        // Combine base path with filename and normalize the result
+        return base.resolve(file).normalize().toString(); // ВИПРАВЛЕНО: Додано normalize()
     }
 
     /**
